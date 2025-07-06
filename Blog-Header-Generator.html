@@ -944,9 +944,35 @@
         }
 
         function downloadImage() {
+            // Get title based on current template
+            let title = '';
+            if (currentTemplate === 'blog') {
+                title = document.getElementById('main-title').value;
+            } else {
+                title = document.getElementById('vs-title').value;
+            }
+            
+            // Clean title for filename
+            let filename = title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+            
+            // Fallback if title is empty or becomes empty after cleaning
+            if (!filename) {
+                filename = currentTemplate === 'blog' ? 'blog-header' : 'vs-comparison';
+            }
+            
+            // Limit filename length
+            if (filename.length > 50) {
+                filename = filename.substring(0, 50).replace(/-$/, '');
+            }
+            
             canvas.toBlob(function(blob) {
                 const link = document.createElement('a');
-                link.download = currentTemplate === 'blog' ? 'blog-header.webp' : 'vs-comparison.webp';
+                link.download = filename + '.webp';
                 link.href = URL.createObjectURL(blob);
                 link.click();
                 URL.revokeObjectURL(link.href);
