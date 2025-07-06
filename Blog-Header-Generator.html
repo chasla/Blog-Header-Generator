@@ -699,9 +699,9 @@
             const leftX = canvas.width / 4;
             const rightX = (canvas.width / 4) * 3;
             const centerX = canvas.width / 2;
-            const imageY = 100;
-            const imageSize = 120;
-            const circleRadius = imageSize / 2 + 10;
+            const imageY = 90;
+            const imageSize = 160;
+            const circleRadius = imageSize / 2 + 15;
 
             // Draw left image container (circle with border and shadow)
             ctx.save();
@@ -715,7 +715,7 @@
             // Outer border circle
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius, 0, 2 * Math.PI);
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius, 0, 2 * Math.PI);
             ctx.fill();
             
             // Inner border
@@ -723,12 +723,12 @@
             ctx.strokeStyle = leftBtnColor;
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius - 6, 0, 2 * Math.PI);
             ctx.stroke();
             
             // Clip and draw left image
             ctx.beginPath();
-            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius - 8, 0, 2 * Math.PI);
             ctx.clip();
             
             if (leftImage) {
@@ -736,11 +736,11 @@
                 const scaledWidth = leftImage.width * scale;
                 const scaledHeight = leftImage.height * scale;
                 const imgX = leftX - scaledWidth / 2;
-                const imgY = imageY + circleRadius - 10 - scaledHeight / 2;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2;
                 ctx.drawImage(leftImage, imgX, imgY, scaledWidth, scaledHeight);
             } else {
                 ctx.fillStyle = '#e9ecef';
-                ctx.fillRect(leftX - circleRadius + 8, imageY - 10 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+                ctx.fillRect(leftX - circleRadius + 8, imageY - 15 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
             }
             
             ctx.restore();
@@ -757,7 +757,7 @@
             // Outer border circle
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
-            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius, 0, 2 * Math.PI);
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius, 0, 2 * Math.PI);
             ctx.fill();
             
             // Inner border
@@ -765,12 +765,12 @@
             ctx.strokeStyle = rightBtnColor;
             ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius - 6, 0, 2 * Math.PI);
             ctx.stroke();
             
             // Clip and draw right image
             ctx.beginPath();
-            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius - 8, 0, 2 * Math.PI);
             ctx.clip();
             
             if (rightImage) {
@@ -778,11 +778,11 @@
                 const scaledWidth = rightImage.width * scale;
                 const scaledHeight = rightImage.height * scale;
                 const imgX = rightX - scaledWidth / 2;
-                const imgY = imageY + circleRadius - 10 - scaledHeight / 2;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2;
                 ctx.drawImage(rightImage, imgX, imgY, scaledWidth, scaledHeight);
             } else {
                 ctx.fillStyle = '#e9ecef';
-                ctx.fillRect(rightX - circleRadius + 8, imageY - 10 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+                ctx.fillRect(rightX - circleRadius + 8, imageY - 15 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
             }
             
             ctx.restore();
@@ -797,13 +797,13 @@
             ctx.shadowOffsetY = 3;
             
             // VS badge background (gradient)
-            const gradient = ctx.createLinearGradient(centerX - 25, imageY + circleRadius - 35, centerX + 25, imageY + circleRadius + 35);
+            const gradient = ctx.createLinearGradient(centerX - 30, imageY + circleRadius - 40, centerX + 30, imageY + circleRadius + 40);
             gradient.addColorStop(0, '#ff6b6b');
             gradient.addColorStop(1, '#ee5a52');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(centerX, imageY + circleRadius - 10, 25, 0, 2 * Math.PI);
+            ctx.arc(centerX, imageY + circleRadius - 15, 30, 0, 2 * Math.PI);
             ctx.fill();
             
             // VS badge border
@@ -811,20 +811,20 @@
             ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(centerX, imageY + circleRadius - 10, 25, 0, 2 * Math.PI);
+            ctx.arc(centerX, imageY + circleRadius - 15, 30, 0, 2 * Math.PI);
             ctx.stroke();
             
             // VS text
             ctx.fillStyle = '#ffffff';
-            ctx.font = `900 16px ${fontFamily}`;
+            ctx.font = `900 18px ${fontFamily}`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText('VS', centerX, imageY + circleRadius - 10);
+            ctx.fillText('VS', centerX, imageY + circleRadius - 15);
             
             ctx.restore();
 
             // Product name buttons
-            const btnY = imageY + imageSize + 40;
+            const btnY = imageY + imageSize + 30;
             const btnWidth = 140;
             const btnHeight = 40;
 
@@ -870,29 +870,29 @@
             ctx.fillText(rightName, rightX, btnY + btnHeight/2);
             ctx.restore();
 
-            // Descriptions with bullet points
-            const descY = btnY + 70;
+            // Descriptions with bullet points (one line space from button)
+            const descY = btnY + btnHeight + 20;
             ctx.fillStyle = '#2c3e50';
-            ctx.font = `400 12px ${fontFamily}`;
+            ctx.font = `400 11px ${fontFamily}`;
             
-            // Left description
-            const leftLines = wrapText(ctx, leftDesc, 180);
+            // Left description (limit to 2 lines)
+            const leftLines = wrapText(ctx, leftDesc, 160).slice(0, 2);
             leftLines.forEach((line, index) => {
                 ctx.textAlign = 'left';
                 ctx.fillStyle = '#666';
-                ctx.fillText('•', leftX - 90, descY + index * 16);
+                ctx.fillText('•', leftX - 80, descY + index * 16);
                 ctx.fillStyle = '#2c3e50';
-                ctx.fillText(line, leftX - 80, descY + index * 16);
+                ctx.fillText(line, leftX - 70, descY + index * 16);
             });
 
-            // Right description  
-            const rightLines = wrapText(ctx, rightDesc, 180);
+            // Right description (limit to 2 lines)
+            const rightLines = wrapText(ctx, rightDesc, 160).slice(0, 2);
             rightLines.forEach((line, index) => {
                 ctx.textAlign = 'left';
                 ctx.fillStyle = '#666';
-                ctx.fillText('•', rightX - 90, descY + index * 16);
+                ctx.fillText('•', rightX - 80, descY + index * 16);
                 ctx.fillStyle = '#2c3e50';
-                ctx.fillText(line, rightX - 80, descY + index * 16);
+                ctx.fillText(line, rightX - 70, descY + index * 16);
             });
         }
 
