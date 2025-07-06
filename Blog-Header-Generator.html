@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Header Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .template-selector {
+            padding: 20px 40px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .template-selector label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .template-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .template-option {
+            padding: 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .template-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .template-option.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .template-option h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .template-option p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
+        }
+
+        .controls {
+            space-y: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .control-group input, .control-group select, .control-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .control-group input:focus, .control-group select:focus, .control-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover .file-upload-label {
+            background: #f0f3ff;
+            border-color: #5a6fd8;
+        }
+
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .vs-uploads {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .vs-item {
+            text-align: center;
+        }
+
+        .vs-item h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .preview-container {
+            position: relative;
+        }
+
+        .canvas-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        #preview-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #e1e8ed;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .font-size-control {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 20px;
+            }
+
+            .template-options {
+                grid-template-columns: 1fr;
+            }
+
+            .vs-uploads {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Blog Header Generator</h1>
+            <p>Create professional blog headers and VS comparisons</p>
+        </div>
+        
+        <div class="template-selector">
+            <label>Choose Template Style</label>
+            <div class="template-options">
+                <div class="template-option active" data-template="blog">
+                    <h3>📝 Blog Header</h3>
+                    <p>Traditional blog header with background image and text overlay</p>
+                </div>
+                <div class="template-option" data-template="vs">
+                    <h3>⚔️ VS Comparison</h3>
+                    <p>Side-by-side product comparison with images and descriptions</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="controls">
+                <!-- Blog Template Controls -->
+                <div id="blog-controls">
+                    <div class="control-group">
+                        <label for="background-upload">Background Image</label>
+                        <div class="file-upload">
+                            <input type="file" id="background-upload" accept="image/*">
+                            <label for="background-upload" class="file-upload-label">
+                                📸 Click to upload background image
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="main-title">Main Title</label>
+                        <textarea id="main-title" placeholder="Enter your blog title here..." rows="2">How to Build Amazing Websites</textarea>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="subtitle">Subtitle</label>
+                        <input type="text" id="subtitle" placeholder="Optional subtitle" value="Viox Knowledge">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="overlay-opacity">Background Overlay</label>
+                        <input type="range" id="overlay-opacity" min="0" max="100" value="50">
+                    </div>
+                </div>
+
+                <!-- VS Template Controls -->
+                <div id="vs-controls" class="hidden">
+                    <div class="control-group">
+                        <label for="vs-title">Comparison Title</label>
+                        <input type="text" id="vs-title" placeholder="Enter comparison title" value="DIFFERENCE BETWEEN DC SPD AND AC SPD">
+                    </div>
+
+                    <div class="control-group">
+                        <label>Product Images</label>
+                        <div class="vs-uploads">
+                            <div class="vs-item">
+                                <h4>Left Product</h4>
+                                <div class="file-upload">
+                                    <input type="file" id="left-image" accept="image/*">
+                                    <label for="left-image" class="file-upload-label">
+                                        📸 Upload Image
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vs-item">
+                                <h4>Right Product</h4>
+                                <div class="file-upload">
+                                    <input type="file" id="right-image" accept="image/*">
+                                    <label for="right-image" class="file-upload-label">
+                                        📸 Upload Image
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Product Names</label>
+                        <div class="vs-uploads">
+                            <div>
+                                <input type="text" id="left-name" placeholder="Left product name" value="DC SPD">
+                            </div>
+                            <div>
+                                <input type="text" id="right-name" placeholder="Right product name" value="AC SPD">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Product Descriptions</label>
+                        <div class="vs-uploads">
+                            <div>
+                                <textarea id="left-desc" placeholder="Left product description" rows="3">Works on the thermal and electrical properties of the conducting materials</textarea>
+                            </div>
+                            <div>
+                                <textarea id="right-desc" placeholder="Right product description" rows="3">Works on the switching principle and electromagnetism</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Header Colors</label>
+                        <div class="color-inputs">
+                            <div>
+                                <label for="header-bg">Header Background</label>
+                                <input type="color" id="header-bg" value="#8e44ad">
+                            </div>
+                            <div>
+                                <label for="header-text">Header Text</label>
+                                <input type="color" id="header-text" value="#ffffff">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Button Colors</label>
+                        <div class="color-inputs">
+                            <div>
+                                <label for="left-btn-color">Left Button</label>
+                                <input type="color" id="left-btn-color" value="#ff6b35">
+                            </div>
+                            <div>
+                                <label for="right-btn-color">Right Button</label>
+                                <input type="color" id="right-btn-color" value="#e84393">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Common Controls -->
+                <div class="control-group">
+                    <label for="website-url">Website URL</label>
+                    <input type="text" id="website-url" value="www.viox.com">
+                </div>
+
+                <div class="control-group">
+                    <label>Font Settings</label>
+                    <select id="font-family">
+                        <option value="Inter">Inter (Modern)</option>
+                        <option value="Poppins">Poppins (Friendly)</option>
+                        <option value="Arial">Arial (Classic)</option>
+                        <option value="Helvetica">Helvetica (Clean)</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="blog-font-sizes">
+                    <label>Font Sizes</label>
+                    <div class="font-size-control">
+                        <div>
+                            <label for="title-size">Title Size</label>
+                            <input type="range" id="title-size" min="40" max="120" value="70">
+                        </div>
+                        <div>
+                            <label for="subtitle-size">Subtitle Size</label>
+                            <input type="range" id="subtitle-size" min="20" max="60" value="32">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="blog-colors">
+                    <label>Colors</label>
+                    <div class="color-inputs">
+                        <div>
+                            <label for="primary-color">Primary Text</label>
+                            <input type="color" id="primary-color" value="#ffffff">
+                        </div>
+                        <div>
+                            <label for="accent-color">Accent Text</label>
+                            <input type="color" id="accent-color" value="#ff9500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-container">
+                <div class="canvas-container">
+                    <canvas id="preview-canvas" width="800" height="400"></canvas>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateHeader()">🎨 Generate</button>
+                    <button class="btn btn-secondary" onclick="downloadImage()">💾 Download WebP</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let backgroundImage = null;
+        let leftImage = null;
+        let rightImage = null;
+        let currentTemplate = 'blog';
+        
+        const canvas = document.getElementById('preview-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to 800x400
+        canvas.width = 800;
+        canvas.height = 400;
+
+        // Template switching
+        document.querySelectorAll('.template-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                currentTemplate = this.dataset.template;
+                
+                // Show/hide relevant controls
+                if (currentTemplate === 'blog') {
+                    document.getElementById('blog-controls').classList.remove('hidden');
+                    document.getElementById('vs-controls').classList.add('hidden');
+                    document.getElementById('blog-font-sizes').classList.remove('hidden');
+                    document.getElementById('blog-colors').classList.remove('hidden');
+                } else {
+                    document.getElementById('blog-controls').classList.add('hidden');
+                    document.getElementById('vs-controls').classList.remove('hidden');
+                    document.getElementById('blog-font-sizes').classList.add('hidden');
+                    document.getElementById('blog-colors').classList.add('hidden');
+                }
+                
+                generateHeader();
+            });
+        });
+
+        // Load background image for blog template
+        document.getElementById('background-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        backgroundImage = img;
+                        generateHeader();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load left image for VS template
+        document.getElementById('left-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        leftImage = img;
+                        generateHeader();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load right image for VS template
+        document.getElementById('right-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        rightImage = img;
+                        generateHeader();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Auto-generate on input changes
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('input', generateHeader);
+        });
+
+        function generateHeader() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (currentTemplate === 'blog') {
+                generateBlogHeader();
+            } else {
+                generateVSHeader();
+            }
+        }
+
+        function generateBlogHeader() {
+            // Draw background
+            if (backgroundImage) {
+                const scale = Math.max(canvas.width / backgroundImage.width, canvas.height / backgroundImage.height);
+                const scaledWidth = backgroundImage.width * scale;
+                const scaledHeight = backgroundImage.height * scale;
+                const x = (canvas.width - scaledWidth) / 2;
+                const y = (canvas.height - scaledHeight) / 2;
+                
+                ctx.drawImage(backgroundImage, x, y, scaledWidth, scaledHeight);
+            } else {
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#2c3e50');
+                gradient.addColorStop(1, '#34495e');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Draw overlay
+            const overlayOpacity = document.getElementById('overlay-opacity').value / 100;
+            ctx.fillStyle = `rgba(0, 0, 0, ${overlayOpacity})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Get values
+            const mainTitle = document.getElementById('main-title').value;
+            const subtitle = document.getElementById('subtitle').value;
+            const websiteUrl = document.getElementById('website-url').value;
+            const fontFamily = document.getElementById('font-family').value;
+            const titleSize = Math.round(document.getElementById('title-size').value * 0.6); // Scale for 800px width
+            const subtitleSize = Math.round(document.getElementById('subtitle-size').value * 0.6);
+            const primaryColor = document.getElementById('primary-color').value;
+            const accentColor = document.getElementById('accent-color').value;
+
+            // Draw subtitle
+            if (subtitle) {
+                ctx.font = `600 ${subtitleSize}px ${fontFamily}`;
+                ctx.fillStyle = primaryColor;
+                ctx.textAlign = 'center';
+                ctx.fillText(subtitle, canvas.width / 2, 80);
+            }
+
+            // Draw main title
+            if (mainTitle) {
+                const words = mainTitle.split(' ');
+                const maxWidth = canvas.width - 80;
+                let lines = [];
+                let currentLine = '';
+
+                ctx.font = `800 ${titleSize}px ${fontFamily}`;
+
+                for (let word of words) {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const metrics = ctx.measureText(testLine);
+                    
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                if (currentLine) lines.push(currentLine);
+
+                const lineHeight = titleSize * 1.2;
+                const startY = canvas.height / 2 - (lines.length - 1) * lineHeight / 2;
+
+                lines.forEach((line, index) => {
+                    const words = line.split(' ');
+                    let x = canvas.width / 2;
+                    ctx.textAlign = 'center';
+                    
+                    const totalWidth = ctx.measureText(line).width;
+                    x = (canvas.width - totalWidth) / 2;
+                    ctx.textAlign = 'left';
+
+                    words.forEach((word, wordIndex) => {
+                        const isAccentWord = wordIndex % 3 === 1 || word.toLowerCase().includes('viox');
+                        ctx.fillStyle = isAccentWord ? accentColor : primaryColor;
+                        
+                        ctx.fillText(word, x, startY + index * lineHeight);
+                        x += ctx.measureText(word + ' ').width;
+                    });
+                });
+            }
+
+            // Draw website URL
+            if (websiteUrl) {
+                ctx.font = `600 16px ${fontFamily}`;
+                ctx.fillStyle = primaryColor;
+                ctx.textAlign = 'right';
+                ctx.fillText(websiteUrl, canvas.width - 40, canvas.height - 40);
+            }
+        }
+
+        function generateVSHeader() {
+            const fontFamily = document.getElementById('font-family').value;
+            const headerBg = document.getElementById('header-bg').value;
+            const headerText = document.getElementById('header-text').value;
+            const leftBtnColor = document.getElementById('left-btn-color').value;
+            const rightBtnColor = document.getElementById('right-btn-color').value;
+            const vsTitle = document.getElementById('vs-title').value;
+            const leftName = document.getElementById('left-name').value;
+            const rightName = document.getElementById('right-name').value;
+            const leftDesc = document.getElementById('left-desc').value;
+            const rightDesc = document.getElementById('right-desc').value;
+            const websiteUrl = document.getElementById('website-url').value;
+
+            // Background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Header
+            ctx.fillStyle = headerBg;
+            ctx.fillRect(0, 0, canvas.width, 60);
+
+            // Header text
+            ctx.font = `700 18px ${fontFamily}`;
+            ctx.fillStyle = headerText;
+            ctx.textAlign = 'left';
+            ctx.fillText(vsTitle, 20, 38);
+
+            // Website URL in header
+            if (websiteUrl) {
+                ctx.textAlign = 'right';
+                ctx.fillText(websiteUrl, canvas.width - 20, 38);
+            }
+
+            // Setup positions
+            const leftX = canvas.width / 4;
+            const rightX = (canvas.width / 4) * 3;
+            const centerX = canvas.width / 2;
+            const imageY = 100;
+            const imageSize = 120;
+            const circleRadius = imageSize / 2 + 10;
+
+            // Draw left image container (circle with border and shadow)
+            ctx.save();
+            
+            // Shadow for left circle
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 5;
+            
+            // Outer border circle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = leftBtnColor;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Clip and draw left image
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 10, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.clip();
+            
+            if (leftImage) {
+                const scale = Math.max((circleRadius - 8) * 2 / leftImage.width, (circleRadius - 8) * 2 / leftImage.height);
+                const scaledWidth = leftImage.width * scale;
+                const scaledHeight = leftImage.height * scale;
+                const imgX = leftX - scaledWidth / 2;
+                const imgY = imageY + circleRadius - 10 - scaledHeight / 2;
+                ctx.drawImage(leftImage, imgX, imgY, scaledWidth, scaledHeight);
+            } else {
+                ctx.fillStyle = '#e9ecef';
+                ctx.fillRect(leftX - circleRadius + 8, imageY - 10 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+            }
+            
+            ctx.restore();
+
+            // Draw right image container (circle with border and shadow)
+            ctx.save();
+            
+            // Shadow for right circle
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 5;
+            
+            // Outer border circle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = rightBtnColor;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Clip and draw right image
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 10, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.clip();
+            
+            if (rightImage) {
+                const scale = Math.max((circleRadius - 8) * 2 / rightImage.width, (circleRadius - 8) * 2 / rightImage.height);
+                const scaledWidth = rightImage.width * scale;
+                const scaledHeight = rightImage.height * scale;
+                const imgX = rightX - scaledWidth / 2;
+                const imgY = imageY + circleRadius - 10 - scaledHeight / 2;
+                ctx.drawImage(rightImage, imgX, imgY, scaledWidth, scaledHeight);
+            } else {
+                ctx.fillStyle = '#e9ecef';
+                ctx.fillRect(rightX - circleRadius + 8, imageY - 10 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+            }
+            
+            ctx.restore();
+
+            // Draw VS badge in center
+            ctx.save();
+            
+            // VS badge shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 3;
+            
+            // VS badge background (gradient)
+            const gradient = ctx.createLinearGradient(centerX - 25, imageY + circleRadius - 35, centerX + 25, imageY + circleRadius + 35);
+            gradient.addColorStop(0, '#ff6b6b');
+            gradient.addColorStop(1, '#ee5a52');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(centerX, imageY + circleRadius - 10, 25, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // VS badge border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, imageY + circleRadius - 10, 25, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // VS text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `900 16px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('VS', centerX, imageY + circleRadius - 10);
+            
+            ctx.restore();
+
+            // Product name buttons
+            const btnY = imageY + imageSize + 40;
+            const btnWidth = 140;
+            const btnHeight = 40;
+
+            // Left button with enhanced style
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+            
+            const leftGradient = ctx.createLinearGradient(leftX - btnWidth/2, btnY, leftX + btnWidth/2, btnY + btnHeight);
+            leftGradient.addColorStop(0, leftBtnColor);
+            leftGradient.addColorStop(1, adjustBrightness(leftBtnColor, -20));
+            
+            ctx.fillStyle = leftGradient;
+            roundRect(ctx, leftX - btnWidth/2, btnY, btnWidth, btnHeight, 20);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = 'white';
+            ctx.font = `700 16px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(leftName, leftX, btnY + btnHeight/2);
+            ctx.restore();
+
+            // Right button with enhanced style
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+            
+            const rightGradient = ctx.createLinearGradient(rightX - btnWidth/2, btnY, rightX + btnWidth/2, btnY + btnHeight);
+            rightGradient.addColorStop(0, rightBtnColor);
+            rightGradient.addColorStop(1, adjustBrightness(rightBtnColor, -20));
+            
+            ctx.fillStyle = rightGradient;
+            roundRect(ctx, rightX - btnWidth/2, btnY, btnWidth, btnHeight, 20);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = 'white';
+            ctx.font = `700 16px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(rightName, rightX, btnY + btnHeight/2);
+            ctx.restore();
+
+            // Descriptions with bullet points
+            const descY = btnY + 70;
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = `400 12px ${fontFamily}`;
+            
+            // Left description
+            const leftLines = wrapText(ctx, leftDesc, 180);
+            leftLines.forEach((line, index) => {
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#666';
+                ctx.fillText('•', leftX - 90, descY + index * 16);
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillText(line, leftX - 80, descY + index * 16);
+            });
+
+            // Right description  
+            const rightLines = wrapText(ctx, rightDesc, 180);
+            rightLines.forEach((line, index) => {
+                ctx.textAlign = 'left';
+                ctx.fillStyle = '#666';
+                ctx.fillText('•', rightX - 90, descY + index * 16);
+                ctx.fillStyle = '#2c3e50';
+                ctx.fillText(line, rightX - 80, descY + index * 16);
+            });
+        }
+
+        // Helper function to adjust color brightness
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function wrapText(ctx, text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            for (let word of words) {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
+        function downloadImage() {
+            canvas.toBlob(function(blob) {
+                const link = document.createElement('a');
+                link.download = currentTemplate === 'blog' ? 'blog-header.webp' : 'vs-comparison.webp';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }, 'image/webp', 0.8);
+        }
+
+        // Generate initial header
+        generateHeader();
+    </script>
+</body>
+</html>
