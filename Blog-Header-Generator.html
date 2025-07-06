@@ -162,6 +162,46 @@
             border-color: #5a6fd8;
         }
 
+        .file-upload-label.dragover {
+            background: #e8f0ff;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+        .file-upload.has-image .file-upload-label {
+            background: #e8f5e8;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: scale(1.1);
+        }
+
+        .file-upload.has-image .delete-btn {
+            display: flex;
+        }
+
         .color-inputs {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -302,8 +342,9 @@
                         <div class="file-upload">
                             <input type="file" id="background-upload" accept="image/*">
                             <label for="background-upload" class="file-upload-label">
-                                📸 Click to upload background image
+                                📸 Click to upload or drag & drop background image
                             </label>
+                            <button type="button" class="delete-btn" onclick="deleteBackgroundImage()">×</button>
                         </div>
                     </div>
 
@@ -314,7 +355,7 @@
 
                     <div class="control-group">
                         <label for="subtitle">Subtitle</label>
-                        <input type="text" id="subtitle" placeholder="Optional subtitle" value="Viox Knowledge">
+                        <input type="text" id="subtitle" placeholder="Optional subtitle" value="VIOX Knowledge">
                     </div>
 
                     <div class="control-group">
@@ -338,8 +379,9 @@
                                 <div class="file-upload">
                                     <input type="file" id="left-image" accept="image/*">
                                     <label for="left-image" class="file-upload-label">
-                                        📸 Upload Image
+                                        📸 Upload or drag image
                                     </label>
+                                    <button type="button" class="delete-btn" onclick="deleteLeftImage()">×</button>
                                 </div>
                             </div>
                             <div class="vs-item">
@@ -347,8 +389,9 @@
                                 <div class="file-upload">
                                     <input type="file" id="right-image" accept="image/*">
                                     <label for="right-image" class="file-upload-label">
-                                        📸 Upload Image
+                                        📸 Upload or drag image
                                     </label>
+                                    <button type="button" class="delete-btn" onclick="deleteRightImage()">×</button>
                                 </div>
                             </div>
                         </div>
@@ -370,10 +413,10 @@
                         <label>Product Descriptions</label>
                         <div class="vs-uploads">
                             <div>
-                                <textarea id="left-desc" placeholder="Left product description" rows="3">Works on the thermal and electrical properties of the conducting materials</textarea>
+                                <textarea id="left-desc" placeholder="Left product description" rows="3">Works on thermal and electrical properties of conducting materials</textarea>
                             </div>
                             <div>
-                                <textarea id="right-desc" placeholder="Right product description" rows="3">Works on the switching principle and electromagnetism</textarea>
+                                <textarea id="right-desc" placeholder="Right product description" rows="3">Works on switching principle and electromagnetism</textarea>
                             </div>
                         </div>
                     </div>
@@ -478,6 +521,50 @@
         canvas.width = 800;
         canvas.height = 400;
 
+        // Add drag and drop functionality to file uploads
+        function setupDragAndDrop(fileInput, callback) {
+            const container = fileInput.closest('.file-upload');
+            const label = container.querySelector('.file-upload-label');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                container.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                container.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                container.addEventListener(eventName, unhighlight, false);
+            });
+
+            container.addEventListener('drop', handleDrop, false);
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight(e) {
+                label.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                label.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    callback(files[0]);
+                }
+            }
+        }
+
         // Template switching
         document.querySelectorAll('.template-option').forEach(option => {
             option.addEventListener('click', function() {
@@ -503,55 +590,79 @@
         });
 
         // Load background image for blog template
-        document.getElementById('background-upload').addEventListener('change', function(e) {
+        const backgroundUpload = document.getElementById('background-upload');
+        backgroundUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        backgroundImage = img;
-                        generateHeader();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                loadBackgroundImage(file);
             }
         });
+
+        // Setup drag and drop for background upload
+        setupDragAndDrop(backgroundUpload, loadBackgroundImage);
+
+        function loadBackgroundImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
         // Load left image for VS template
-        document.getElementById('left-image').addEventListener('change', function(e) {
+        const leftImageUpload = document.getElementById('left-image');
+        leftImageUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        leftImage = img;
-                        generateHeader();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                loadLeftImage(file);
             }
         });
 
+        // Setup drag and drop for left image
+        setupDragAndDrop(leftImageUpload, loadLeftImage);
+
+        function loadLeftImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    leftImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         // Load right image for VS template
-        document.getElementById('right-image').addEventListener('change', function(e) {
+        const rightImageUpload = document.getElementById('right-image');
+        rightImageUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const img = new Image();
-                    img.onload = function() {
-                        rightImage = img;
-                        generateHeader();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                loadRightImage(file);
             }
         });
+
+        // Setup drag and drop for right image
+        setupDragAndDrop(rightImageUpload, loadRightImage);
+
+        function loadRightImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    rightImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
 
         // Auto-generate on input changes
         document.querySelectorAll('input, textarea, select').forEach(element => {
