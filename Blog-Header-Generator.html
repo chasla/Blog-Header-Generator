@@ -168,39 +168,7 @@
             transform: scale(1.02);
         }
 
-        .file-upload.has-image .file-upload-label {
-            background: #e8f5e8;
-            border-color: #28a745;
-            color: #155724;
-        }
 
-        .delete-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            z-index: 10;
-            transition: all 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: #c82333;
-            transform: scale(1.1);
-        }
-
-        .file-upload.has-image .delete-btn {
-            display: flex;
-        }
 
         .color-inputs {
             display: grid;
@@ -232,6 +200,25 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .drag-hint {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .canvas-container:hover .drag-hint {
+            opacity: 1;
         }
 
         #preview-canvas {
@@ -344,7 +331,6 @@
                             <label for="background-upload" class="file-upload-label">
                                 📸 Click to upload or drag & drop background image
                             </label>
-                            <button type="button" class="delete-btn" onclick="deleteBackgroundImage()">×</button>
                         </div>
                     </div>
 
@@ -381,7 +367,6 @@
                                     <label for="left-image" class="file-upload-label">
                                         📸 Upload or drag image
                                     </label>
-                                    <button type="button" class="delete-btn" onclick="deleteLeftImage()">×</button>
                                 </div>
                             </div>
                             <div class="vs-item">
@@ -391,7 +376,6 @@
                                     <label for="right-image" class="file-upload-label">
                                         📸 Upload or drag image
                                     </label>
-                                    <button type="button" class="delete-btn" onclick="deleteRightImage()">×</button>
                                 </div>
                             </div>
                         </div>
@@ -498,6 +482,7 @@
             <div class="preview-container">
                 <div class="canvas-container">
                     <canvas id="preview-canvas" width="800" height="400"></canvas>
+                    <div class="drag-hint" id="drag-hint">📱 Drag images to adjust position</div>
                 </div>
                 
                 <div class="action-buttons">
@@ -512,7 +497,12 @@
         let backgroundImage = null;
         let leftImage = null;
         let rightImage = null;
+        let leftImageOffset = { x: 0, y: 0 };
+        let rightImageOffset = { x: 0, y: 0 };
         let currentTemplate = 'blog';
+        let isDragging = false;
+        let dragTarget = null;
+        let dragStart = { x: 0, y: 0 };
         
         const canvas = document.getElementById('preview-canvas');
         const ctx = canvas.getContext('2d');
@@ -520,6 +510,118 @@
         // Set canvas size to 800x400
         canvas.width = 800;
         canvas.height = 400;
+
+        // Add canvas mouse events for image dragging
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+        canvas.addEventListener('mouseleave', handleMouseUp);
+        canvas.style.cursor = 'default';
+
+        function handleMouseDown(e) {
+            if (currentTemplate !== 'vs') return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            // Check if click is within image areas
+            const centerX = canvas.width / 2;
+            const imageY = 90;
+            const circleRadius = 95; // imageSize/2 + 15
+            const vsRadius = 35;
+            const spacing = 30;
+            const distanceFromCenter = circleRadius + spacing + vsRadius;
+            const leftX = centerX - distanceFromCenter;
+            const rightX = centerX + distanceFromCenter;
+            const imageCenter = imageY + circleRadius - 15;
+            
+            // Check left image
+            if (leftImage) {
+                const dist = Math.sqrt((x - leftX) ** 2 + (y - imageCenter) ** 2);
+                if (dist <= circleRadius - 8) {
+                    isDragging = true;
+                    dragTarget = 'left';
+                    dragStart = { x: x - leftImageOffset.x, y: y - leftImageOffset.y };
+                    canvas.style.cursor = 'move';
+                    return;
+                }
+            }
+            
+            // Check right image
+            if (rightImage) {
+                const dist = Math.sqrt((x - rightX) ** 2 + (y - imageCenter) ** 2);
+                if (dist <= circleRadius - 8) {
+                    isDragging = true;
+                    dragTarget = 'right';
+                    dragStart = { x: x - rightImageOffset.x, y: y - rightImageOffset.y };
+                    canvas.style.cursor = 'move';
+                    return;
+                }
+            }
+        }
+
+        function handleMouseMove(e) {
+            if (currentTemplate !== 'vs') return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            if (isDragging && dragTarget) {
+                // Calculate new offset
+                const newOffsetX = x - dragStart.x;
+                const newOffsetY = y - dragStart.y;
+                
+                // Limit offset to keep image within reasonable bounds
+                const maxOffset = 50;
+                const limitedOffsetX = Math.max(-maxOffset, Math.min(maxOffset, newOffsetX));
+                const limitedOffsetY = Math.max(-maxOffset, Math.min(maxOffset, newOffsetY));
+                
+                if (dragTarget === 'left') {
+                    leftImageOffset = { x: limitedOffsetX, y: limitedOffsetY };
+                } else if (dragTarget === 'right') {
+                    rightImageOffset = { x: limitedOffsetX, y: limitedOffsetY };
+                }
+                
+                generateHeader();
+            } else {
+                // Check if hovering over draggable areas
+                const centerX = canvas.width / 2;
+                const imageY = 90;
+                const circleRadius = 95;
+                const vsRadius = 35;
+                const spacing = 30;
+                const distanceFromCenter = circleRadius + spacing + vsRadius;
+                const leftX = centerX - distanceFromCenter;
+                const rightX = centerX + distanceFromCenter;
+                const imageCenter = imageY + circleRadius - 15;
+                
+                let overDraggable = false;
+                
+                if (leftImage) {
+                    const dist = Math.sqrt((x - leftX) ** 2 + (y - imageCenter) ** 2);
+                    if (dist <= circleRadius - 8) {
+                        overDraggable = true;
+                    }
+                }
+                
+                if (rightImage && !overDraggable) {
+                    const dist = Math.sqrt((x - rightX) ** 2 + (y - imageCenter) ** 2);
+                    if (dist <= circleRadius - 8) {
+                        overDraggable = true;
+                    }
+                }
+                
+                canvas.style.cursor = overDraggable ? 'move' : 'default';
+            }
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+            dragTarget = null;
+            canvas.style.cursor = 'default';
+        }
 
         // Add drag and drop functionality to file uploads
         function setupDragAndDrop(fileInput, callback) {
@@ -677,6 +779,18 @@
             } else {
                 generateVSHeader();
             }
+            
+            // Update drag hint visibility
+            updateDragHint();
+        }
+
+        function updateDragHint() {
+            const dragHint = document.getElementById('drag-hint');
+            if (currentTemplate === 'vs' && (leftImage || rightImage)) {
+                dragHint.style.display = 'block';
+            } else {
+                dragHint.style.display = 'none';
+            }
         }
 
         function generateBlogHeader() {
@@ -806,13 +920,18 @@
                 ctx.fillText(websiteUrl, canvas.width - 20, 38);
             }
 
-            // Setup positions
-            const leftX = canvas.width / 4;
-            const rightX = (canvas.width / 4) * 3;
+            // Setup positions - properly spaced
             const centerX = canvas.width / 2;
             const imageY = 90;
             const imageSize = 160;
             const circleRadius = imageSize / 2 + 15;
+            const vsRadius = 35;
+            const spacing = 30; // 5 character spacing approximately
+            
+            // Calculate positions to avoid overlap
+            const distanceFromCenter = circleRadius + spacing + vsRadius;
+            const leftX = centerX - distanceFromCenter;
+            const rightX = centerX + distanceFromCenter;
 
             // Draw left image container (circle with border and shadow)
             ctx.save();
@@ -846,8 +965,8 @@
                 const scale = Math.max((circleRadius - 8) * 2 / leftImage.width, (circleRadius - 8) * 2 / leftImage.height);
                 const scaledWidth = leftImage.width * scale;
                 const scaledHeight = leftImage.height * scale;
-                const imgX = leftX - scaledWidth / 2;
-                const imgY = imageY + circleRadius - 15 - scaledHeight / 2;
+                const imgX = leftX - scaledWidth / 2 + leftImageOffset.x;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2 + leftImageOffset.y;
                 ctx.drawImage(leftImage, imgX, imgY, scaledWidth, scaledHeight);
             } else {
                 ctx.fillStyle = '#e9ecef';
@@ -888,8 +1007,8 @@
                 const scale = Math.max((circleRadius - 8) * 2 / rightImage.width, (circleRadius - 8) * 2 / rightImage.height);
                 const scaledWidth = rightImage.width * scale;
                 const scaledHeight = rightImage.height * scale;
-                const imgX = rightX - scaledWidth / 2;
-                const imgY = imageY + circleRadius - 15 - scaledHeight / 2;
+                const imgX = rightX - scaledWidth / 2 + rightImageOffset.x;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2 + rightImageOffset.y;
                 ctx.drawImage(rightImage, imgX, imgY, scaledWidth, scaledHeight);
             } else {
                 ctx.fillStyle = '#e9ecef';
@@ -898,46 +1017,51 @@
             
             ctx.restore();
 
-            // Draw VS badge in center
+            // Draw VS badge in center - made larger
             ctx.save();
             
             // VS badge shadow
             ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 3;
+            ctx.shadowOffsetY = 4;
             
             // VS badge background (gradient)
-            const gradient = ctx.createLinearGradient(centerX - 30, imageY + circleRadius - 40, centerX + 30, imageY + circleRadius + 40);
+            const gradient = ctx.createLinearGradient(centerX - 35, imageY + circleRadius - 50, centerX + 35, imageY + circleRadius + 50);
             gradient.addColorStop(0, '#ff6b6b');
             gradient.addColorStop(1, '#ee5a52');
             
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(centerX, imageY + circleRadius - 15, 30, 0, 2 * Math.PI);
+            ctx.arc(centerX, imageY + circleRadius - 15, 35, 0, 2 * Math.PI);
             ctx.fill();
             
             // VS badge border
             ctx.shadowColor = 'transparent';
             ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
+            ctx.lineWidth = 4;
             ctx.beginPath();
-            ctx.arc(centerX, imageY + circleRadius - 15, 30, 0, 2 * Math.PI);
+            ctx.arc(centerX, imageY + circleRadius - 15, 35, 0, 2 * Math.PI);
             ctx.stroke();
             
-            // VS text
+            // VS text - made larger
             ctx.fillStyle = '#ffffff';
-            ctx.font = `900 18px ${fontFamily}`;
+            ctx.font = `900 22px ${fontFamily}`;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText('VS', centerX, imageY + circleRadius - 15);
             
             ctx.restore();
 
-            // Product name buttons
+            // Product name buttons - dynamic width based on text
             const btnY = imageY + imageSize + 30;
-            const btnWidth = 140;
             const btnHeight = 40;
+            const btnFont = `700 16px ${fontFamily}`;
+
+            // Calculate button widths based on text
+            ctx.font = btnFont;
+            const leftBtnWidth = Math.max(100, ctx.measureText(leftName).width + 40);
+            const rightBtnWidth = Math.max(100, ctx.measureText(rightName).width + 40);
 
             // Left button with enhanced style
             ctx.save();
@@ -945,16 +1069,16 @@
             ctx.shadowBlur = 8;
             ctx.shadowOffsetY = 2;
             
-            const leftGradient = ctx.createLinearGradient(leftX - btnWidth/2, btnY, leftX + btnWidth/2, btnY + btnHeight);
+            const leftGradient = ctx.createLinearGradient(leftX - leftBtnWidth/2, btnY, leftX + leftBtnWidth/2, btnY + btnHeight);
             leftGradient.addColorStop(0, leftBtnColor);
             leftGradient.addColorStop(1, adjustBrightness(leftBtnColor, -20));
             
             ctx.fillStyle = leftGradient;
-            roundRect(ctx, leftX - btnWidth/2, btnY, btnWidth, btnHeight, 20);
+            roundRect(ctx, leftX - leftBtnWidth/2, btnY, leftBtnWidth, btnHeight, 20);
             
             ctx.shadowColor = 'transparent';
             ctx.fillStyle = 'white';
-            ctx.font = `700 16px ${fontFamily}`;
+            ctx.font = btnFont;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(leftName, leftX, btnY + btnHeight/2);
@@ -966,44 +1090,39 @@
             ctx.shadowBlur = 8;
             ctx.shadowOffsetY = 2;
             
-            const rightGradient = ctx.createLinearGradient(rightX - btnWidth/2, btnY, rightX + btnWidth/2, btnY + btnHeight);
+            const rightGradient = ctx.createLinearGradient(rightX - rightBtnWidth/2, btnY, rightX + rightBtnWidth/2, btnY + btnHeight);
             rightGradient.addColorStop(0, rightBtnColor);
             rightGradient.addColorStop(1, adjustBrightness(rightBtnColor, -20));
             
             ctx.fillStyle = rightGradient;
-            roundRect(ctx, rightX - btnWidth/2, btnY, btnWidth, btnHeight, 20);
+            roundRect(ctx, rightX - rightBtnWidth/2, btnY, rightBtnWidth, btnHeight, 20);
             
             ctx.shadowColor = 'transparent';
             ctx.fillStyle = 'white';
-            ctx.font = `700 16px ${fontFamily}`;
+            ctx.font = btnFont;
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.fillText(rightName, rightX, btnY + btnHeight/2);
             ctx.restore();
 
-            // Descriptions with bullet points (one line space from button)
+            // Descriptions as normal paragraphs (one line space from button)
             const descY = btnY + btnHeight + 20;
             ctx.fillStyle = '#2c3e50';
             ctx.font = `400 11px ${fontFamily}`;
             
-            // Left description (limit to 2 lines)
-            const leftLines = wrapText(ctx, leftDesc, 160).slice(0, 2);
+            // Left description (width for ~100 characters, 3 lines max)
+            const descWidth = 200;
+            const leftLines = wrapText(ctx, leftDesc, descWidth).slice(0, 3);
             leftLines.forEach((line, index) => {
-                ctx.textAlign = 'left';
-                ctx.fillStyle = '#666';
-                ctx.fillText('•', leftX - 80, descY + index * 16);
-                ctx.fillStyle = '#2c3e50';
-                ctx.fillText(line, leftX - 70, descY + index * 16);
+                ctx.textAlign = 'center';
+                ctx.fillText(line, leftX, descY + index * 14);
             });
 
-            // Right description (limit to 2 lines)
-            const rightLines = wrapText(ctx, rightDesc, 160).slice(0, 2);
+            // Right description (width for ~100 characters, 3 lines max)
+            const rightLines = wrapText(ctx, rightDesc, descWidth).slice(0, 3);
             rightLines.forEach((line, index) => {
-                ctx.textAlign = 'left';
-                ctx.fillStyle = '#666';
-                ctx.fillText('•', rightX - 80, descY + index * 16);
-                ctx.fillStyle = '#2c3e50';
-                ctx.fillText(line, rightX - 70, descY + index * 16);
+                ctx.textAlign = 'center';
+                ctx.fillText(line, rightX, descY + index * 14);
             });
         }
 
