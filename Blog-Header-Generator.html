@@ -3,832 +3,1206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Blog Header Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Blog Header Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-            --text-main: #1e293b;
-            --text-sub: #64748b;
-            --radius: 16px;
-            --shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--text-main);
-            padding: 40px 20px;
+            padding: 20px;
         }
 
-        .app-container {
-            max-width: 1400px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            display: grid;
-            grid-template-columns: 400px 1fr; /* 左侧控制，右侧预览 */
-            gap: 40px;
-            align-items: start;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
 
-        /* --- Left Sidebar (Controls) --- */
-        .sidebar {
-            background: var(--glass-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
             padding: 30px;
-            border: var(--glass-border);
-            max-height: calc(100vh - 80px);
-            overflow-y: auto;
-            position: sticky;
-            top: 40px;
+            text-align: center;
         }
 
-        /* Scrollbar styling */
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-
-        .logo-area { margin-bottom: 30px; text-align: center; }
-        .logo-area h1 { font-size: 1.5rem; font-weight: 800; background: linear-gradient(to right, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .logo-area p { font-size: 0.85rem; color: var(--text-sub); margin-top: 5px; }
-
-        /* Template Switcher */
-        .template-switcher {
-            display: flex;
-            background: #f1f5f9;
-            padding: 4px;
-            border-radius: 12px;
-            margin-bottom: 30px;
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
         }
-        .t-btn {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 10px;
-            border-radius: 8px;
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .template-selector {
+            padding: 20px 40px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .template-selector label {
             font-weight: 600;
-            color: var(--text-sub);
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .template-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .template-option {
+            padding: 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .template-option:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .template-option.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .template-option h3 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .template-option p {
+            color: #666;
             font-size: 0.9rem;
         }
-        .t-btn.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            padding: 40px;
         }
 
-        /* Form Controls */
-        .control-group { margin-bottom: 24px; }
+        .controls {
+            space-y: 25px;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
         .control-group label {
             display: block;
-            font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-main);
             margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 0.95rem;
         }
 
-        input[type="text"], textarea, select {
+        .control-group input, .control-group select, .control-group textarea {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            background: #f8fafc;
-        }
-        input[type="text"]:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        /* File Upload */
-        .file-upload { position: relative; width: 100%; }
-        .file-upload input { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2; }
-        .upload-box {
-            border: 2px dashed #cbd5e1;
+            border: 2px solid #e1e8ed;
             border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            background: #f8fafc;
-            transition: all 0.3s;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
         }
-        .upload-box.dragover { border-color: var(--primary); background: #e0e7ff; }
-        .upload-icon { font-size: 24px; display: block; margin-bottom: 5px; }
-        .upload-text { font-size: 0.8rem; color: var(--text-sub); }
 
-        /* Color & Range Inputs */
-        .row-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        
-        input[type="color"] {
-            -webkit-appearance: none;
-            border: none;
-            width: 100%;
-            height: 42px;
-            border-radius: 8px;
-            cursor: pointer;
-            padding: 0;
-            background: none;
-        }
-        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        input[type="color"]::-webkit-color-swatch { border: 1px solid #e2e8f0; border-radius: 8px; }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            background: #e2e8f0;
-            border-radius: 3px;
+        .control-group input:focus, .control-group select:focus, .control-group textarea:focus {
             outline: none;
-            -webkit-appearance: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
-            background: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-
-        /* --- Right Area (Preview) --- */
-        .preview-area {
-            position: sticky;
-            top: 40px;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .canvas-wrapper {
-            background: white;
-            padding: 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
+        .file-upload {
             position: relative;
-            line-height: 0; /* remove bottom gap */
-        }
-
-        canvas {
+            display: inline-block;
+            cursor: pointer;
             width: 100%;
-            height: auto;
-            border-radius: 8px;
-            background: #f1f5f9;
         }
 
-        .hint {
+        .file-upload input[type=file] {
             position: absolute;
-            top: 30px;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
+            padding: 20px;
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload:hover .file-upload-label {
+            background: #f0f3ff;
+            border-color: #5a6fd8;
+        }
+
+        .file-upload-label.dragover {
+            background: #e8f0ff;
+            border-color: #667eea;
+            transform: scale(1.02);
+        }
+
+
+
+        .color-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .vs-uploads {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .vs-item {
+            text-align: center;
+        }
+
+        .vs-item h4 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .preview-container {
+            position: relative;
+        }
+
+        .canvas-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .drag-hint {
+            position: absolute;
+            bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
+            background: rgba(0, 0, 0, 0.7);
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            pointer-events: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
             opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 10;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
         }
-        .canvas-wrapper:hover .hint { opacity: 1; }
 
-        .actions {
-            margin-top: 20px;
+        .canvas-container:hover .drag-hint {
+            opacity: 1;
+        }
+
+        #preview-canvas {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .action-buttons {
             display: flex;
             gap: 15px;
-            justify-content: flex-end;
+            margin-top: 20px;
         }
 
         .btn {
             padding: 12px 24px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
             border: none;
+            border-radius: 12px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            flex: 1;
         }
-        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3); }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-        .btn-secondary { background: white; color: var(--text-main); border: 1px solid #e2e8f0; }
-        .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-        .hidden { display: none !important; }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
 
-        @media (max-width: 1000px) {
-            .app-container { grid-template-columns: 1fr; }
-            .sidebar { max-height: none; position: static; }
-            .preview-area { position: static; }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #e1e8ed;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+        }
+
+        .font-size-control {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 20px;
+            }
+
+            .template-options {
+                grid-template-columns: 1fr;
+            }
+
+            .vs-uploads {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="sidebar">
-        <div class="logo-area">
-            <h1>Header Gen</h1>
-            <p>Professional Blog Asset Creator</p>
+    <div class="container">
+        <div class="header">
+            <h1>Blog Header Generator</h1>
+            <p>Create professional blog headers and VS comparisons</p>
         </div>
-
-        <div class="template-switcher">
-            <button class="t-btn active" data-template="blog" onclick="switchTemplate('blog')">📝 Blog Cover</button>
-            <button class="t-btn" data-template="vs" onclick="switchTemplate('vs')">⚔️ VS Battle</button>
+        
+        <div class="template-selector">
+            <label>Choose Template Style</label>
+            <div class="template-options">
+                <div class="template-option active" data-template="blog">
+                    <h3>📝 Blog Header</h3>
+                    <p>Traditional blog header with background image and text overlay</p>
+                </div>
+                <div class="template-option" data-template="vs">
+                    <h3>⚔️ VS Comparison</h3>
+                    <p>Side-by-side product comparison with images and descriptions</p>
+                </div>
+            </div>
         </div>
+        
+        <div class="main-content">
+            <div class="controls">
+                <div id="blog-controls">
+                    <div class="control-group">
+                        <label for="background-upload">Background Image</label>
+                        <div class="file-upload">
+                            <input type="file" id="background-upload" accept="image/*">
+                            <label for="background-upload" class="file-upload-label">
+                                📸 Click to upload or drag & drop background image
+                            </label>
+                        </div>
+                    </div>
 
-        <div id="blog-controls">
-            <div class="control-group">
-                <label>Background Image</label>
-                <div class="file-upload">
-                    <input type="file" id="bg-upload" accept="image/*">
-                    <div class="upload-box">
-                        <span class="upload-icon">📸</span>
-                        <span class="upload-text">Drop image or click to upload</span>
+                    <div class="control-group">
+                        <label for="main-title">Main Title</label>
+                        <textarea id="main-title" placeholder="Enter your blog title here..." rows="2">How to Build Amazing Websites</textarea>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="subtitle">Subtitle</label>
+                        <input type="text" id="subtitle" placeholder="Optional subtitle" value="VIOX Knowledge">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="overlay-opacity">Background Overlay</label>
+                        <input type="range" id="overlay-opacity" min="0" max="100" value="50">
                     </div>
                 </div>
-            </div>
 
-            <div class="control-group">
-                <label>Main Title</label>
-                <textarea id="blog-title" rows="2">How to Build Amazing Websites</textarea>
-            </div>
+                <div id="vs-controls" class="hidden">
+                    <div class="control-group">
+                        <label for="vs-title">Comparison Title</label>
+                        <input type="text" id="vs-title" placeholder="Enter comparison title" value="DIFFERENCE BETWEEN DC SPD AND AC SPD">
+                    </div>
 
-            <div class="control-group">
-                <label>Subtitle / Category</label>
-                <input type="text" id="blog-subtitle" value="VIOX Knowledge Base">
-            </div>
+                    <div class="control-group">
+                        <label>Product Images</label>
+                        <div class="vs-uploads">
+                            <div class="vs-item">
+                                <h4>Left Product</h4>
+                                <div class="file-upload">
+                                    <input type="file" id="left-image" accept="image/*">
+                                    <label for="left-image" class="file-upload-label">
+                                        📸 Upload or drag image
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="vs-item">
+                                <h4>Right Product</h4>
+                                <div class="file-upload">
+                                    <input type="file" id="right-image" accept="image/*">
+                                    <label for="right-image" class="file-upload-label">
+                                        📸 Upload or drag image
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Overlay Opacity</label>
-                    <input type="range" id="overlay-opacity" min="0" max="90" value="50">
-                </div>
-                <div>
-                    <label>Font Size</label>
-                    <input type="range" id="font-scale" min="80" max="150" value="100">
-                </div>
-            </div>
+                    <div class="control-group">
+                        <label>Product Names</label>
+                        <div class="vs-uploads">
+                            <div>
+                                <input type="text" id="left-name" placeholder="Left product name" value="DC SPD">
+                            </div>
+                            <div>
+                                <input type="text" id="right-name" placeholder="Right product name" value="AC SPD">
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Text Color</label>
-                    <input type="color" id="color-primary" value="#ffffff">
-                </div>
-                <div>
-                    <label>Accent Color</label>
-                    <input type="color" id="color-accent" value="#fbbf24">
-                </div>
-            </div>
-        </div>
+                    <div class="control-group">
+                        <label>Product Descriptions</label>
+                        <div class="vs-uploads">
+                            <div>
+                                <textarea id="left-desc" placeholder="Left product description" rows="3">Works on thermal and electrical properties of conducting materials</textarea>
+                            </div>
+                            <div>
+                                <textarea id="right-desc" placeholder="Right product description" rows="3">Works on switching principle and electromagnetism</textarea>
+                            </div>
+                        </div>
+                    </div>
 
-        <div id="vs-controls" class="hidden">
-            <div class="control-group">
-                <label>Comparison Title</label>
-                <input type="text" id="vs-title" value="DIFFERENCE BETWEEN DC SPD AND AC SPD">
-            </div>
+                    <div class="control-group">
+                        <label>Header Colors</label>
+                        <div class="color-inputs">
+                            <div>
+                                <label for="header-bg">Header Background</label>
+                                <input type="color" id="header-bg" value="#8e44ad">
+                            </div>
+                            <div>
+                                <label for="header-text">Header Text</label>
+                                <input type="color" id="header-text" value="#ffffff">
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Left Product Image</label>
-                    <div class="file-upload">
-                        <input type="file" id="left-img" accept="image/*">
-                        <div class="upload-box">
-                            <span class="upload-text">Upload Left</span>
+                    <div class="control-group">
+                        <label>Button Colors</label>
+                        <div class="color-inputs">
+                            <div>
+                                <label for="left-btn-color">Left Button</label>
+                                <input type="color" id="left-btn-color" value="#ff6b35">
+                            </div>
+                            <div>
+                                <label for="right-btn-color">Right Button</label>
+                                <input type="color" id="right-btn-color" value="#e84393">
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div>
-                    <label>Right Product Image</label>
-                    <div class="file-upload">
-                        <input type="file" id="right-img" accept="image/*">
-                        <div class="upload-box">
-                            <span class="upload-text">Upload Right</span>
+
+                <div class="control-group">
+                    <label for="website-url">Website URL</label>
+                    <input type="text" id="website-url" value="www.viox.com">
+                </div>
+
+                <div class="control-group">
+                    <label>Font Settings</label>
+                    <select id="font-family">
+                        <option value="Inter">Inter (Modern)</option>
+                        <option value="Poppins">Poppins (Friendly)</option>
+                        <option value="Arial">Arial (Classic)</option>
+                        <option value="Helvetica">Helvetica (Clean)</option>
+                    </select>
+                </div>
+
+                <div class="control-group" id="blog-font-sizes">
+                    <label>Font Sizes</label>
+                    <div class="font-size-control">
+                        <div>
+                            <label for="title-size">Title Size</label>
+                            <input type="range" id="title-size" min="40" max="120" value="70">
+                        </div>
+                        <div>
+                            <label for="subtitle-size">Subtitle Size</label>
+                            <input type="range" id="subtitle-size" min="20" max="60" value="32">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group" id="blog-colors">
+                    <label>Colors</label>
+                    <div class="color-inputs">
+                        <div>
+                            <label for="primary-color">Primary Text</label>
+                            <input type="color" id="primary-color" value="#ffffff">
+                        </div>
+                        <div>
+                            <label for="accent-color">Accent Text</label>
+                            <input type="color" id="accent-color" value="#ff9500">
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Left Name</label>
-                    <input type="text" id="left-name" value="DC SPD">
+            <div class="preview-container">
+                <div class="canvas-container">
+                    <canvas id="preview-canvas" width="800" height="400"></canvas>
+                    <div class="drag-hint" id="drag-hint">📱 Drag images to adjust position</div>
                 </div>
-                <div>
-                    <label>Right Name</label>
-                    <input type="text" id="right-name" value="AC SPD">
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateHeader()">🎨 Generate</button>
+                    <button class="btn btn-secondary" onclick="downloadImage()">💾 Download WebP</button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <div class="control-group">
-                <label>Left Description</label>
-                <textarea id="left-desc" rows="2">Works on thermal and electrical properties of conducting materials</textarea>
-            </div>
+    <script>
+        let backgroundImage = null;
+        let leftImage = null;
+        let rightImage = null;
+        let leftImageOffset = { x: 0, y: 0 };
+        let rightImageOffset = { x: 0, y: 0 };
+        let currentTemplate = 'blog';
+        let isDragging = false;
+        let dragTarget = null;
+        let dragStart = { x: 0, y: 0 };
+        
+        const canvas = document.getElementById('preview-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to 800x400
+        canvas.width = 800;
+        canvas.height = 400;
+
+        // Add canvas mouse events for image dragging
+        canvas.addEventListener('mousedown', handleMouseDown);
+        canvas.addEventListener('mousemove', handleMouseMove);
+        canvas.addEventListener('mouseup', handleMouseUp);
+        canvas.addEventListener('mouseleave', handleMouseUp);
+        canvas.style.cursor = 'default';
+
+        function handleMouseDown(e) {
+            if (currentTemplate !== 'vs') return;
             
-            <div class="control-group">
-                <label>Right Description</label>
-                <textarea id="right-desc" rows="2">Works on switching principle and electromagnetism</textarea>
-            </div>
-
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Header BG</label>
-                    <input type="color" id="vs-header-bg" value="#8e44ad">
-                </div>
-                <div>
-                    <label>Left Button</label>
-                    <input type="color" id="vs-left-col" value="#ff6b35">
-                </div>
-            </div>
-            <div class="control-group row-inputs">
-                <div>
-                    <label>Header Text</label>
-                    <input type="color" id="vs-header-text" value="#ffffff">
-                </div>
-                <div>
-                    <label>Right Button</label>
-                    <input type="color" id="vs-right-col" value="#e84393">
-                </div>
-            </div>
-        </div>
-
-        <div class="control-group" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
-            <label>Website URL</label>
-            <input type="text" id="website-url" value="www.viox.com">
-        </div>
-        
-        <div class="control-group">
-            <label>Font Style</label>
-            <select id="font-family">
-                <option value="Inter">Inter (Modern & Clean)</option>
-                <option value="Poppins">Poppins (Bold & Friendly)</option>
-                <option value="Arial">Arial (Standard)</option>
-            </select>
-        </div>
-    </div>
-
-    <div class="preview-area">
-        <div class="canvas-wrapper">
-            <canvas id="canvas" width="800" height="400"></canvas>
-            <div class="hint" id="drag-hint">🖱️ Drag images to adjust position</div>
-        </div>
-        
-        <div class="actions">
-            <button class="btn btn-secondary" onclick="generate()">🔄 Refresh</button>
-            <button class="btn btn-primary" onclick="downloadImage()">💾 Download WebP</button>
-        </div>
-    </div>
-</div>
-
-<script>
-    // State
-    const state = {
-        template: 'blog',
-        bgImg: null,
-        leftImg: null,
-        rightImg: null,
-        offsets: { left: {x:0, y:0}, right: {x:0, y:0} },
-        drag: { active: false, target: null, start: {x:0, y:0} }
-    };
-
-    // Elements
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Init Canvas
-    canvas.width = 800;
-    canvas.height = 400;
-
-    // --- Event Listeners ---
-    
-    // Inputs: Auto-refresh on any change
-    document.querySelectorAll('input, textarea, select').forEach(el => {
-        el.addEventListener('input', generate);
-    });
-
-    // File Uploads
-    setupFileUpload('bg-upload', (img) => { state.bgImg = img; generate(); });
-    setupFileUpload('left-img', (img) => { state.leftImg = img; generate(); });
-    setupFileUpload('right-img', (img) => { state.rightImg = img; generate(); });
-
-    function setupFileUpload(id, callback) {
-        const input = document.getElementById(id);
-        const box = input.nextElementSibling;
-        
-        input.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if(!file) return;
-            handleFile(file, callback, box);
-        });
-
-        // Drag & Drop visual feedback
-        input.addEventListener('dragover', () => box.classList.add('dragover'));
-        input.addEventListener('dragleave', () => box.classList.remove('dragover'));
-        input.addEventListener('drop', (e) => {
-            box.classList.remove('dragover');
-            // The input handles the file list automatically, but we intercept change
-        });
-    }
-
-    function handleFile(file, callback, boxElement) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-                callback(img);
-                if(boxElement) boxElement.querySelector('.upload-text').innerText = "Image Loaded! ✅";
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-
-    // Template Switching
-    window.switchTemplate = (type) => {
-        state.template = type;
-        document.querySelectorAll('.t-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`.t-btn[data-template="${type}"]`).classList.add('active');
-        
-        document.getElementById('blog-controls').classList.toggle('hidden', type !== 'blog');
-        document.getElementById('vs-controls').classList.toggle('hidden', type !== 'vs');
-        
-        document.getElementById('drag-hint').style.display = type === 'vs' ? 'block' : 'none';
-        generate();
-    };
-
-    // --- Canvas Drawing Logic ---
-
-    function generate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        if (state.template === 'blog') drawBlogHeader();
-        else drawVSHeader();
-    }
-
-    function drawBlogHeader() {
-        // Background
-        if (state.bgImg) {
-            drawCoverImage(state.bgImg);
-        } else {
-            const grad = ctx.createLinearGradient(0, 0, 800, 400);
-            grad.addColorStop(0, '#1e293b');
-            grad.addColorStop(1, '#334155');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0,0, 800, 400);
-        }
-
-        // Overlay
-        const opacity = document.getElementById('overlay-opacity').value / 100;
-        ctx.fillStyle = `rgba(0,0,0,${opacity})`;
-        ctx.fillRect(0,0, 800, 400);
-
-        // Text Config
-        const font = document.getElementById('font-family').value;
-        const scale = document.getElementById('font-scale').value / 100;
-        const primaryCol = document.getElementById('color-primary').value;
-        const accentCol = document.getElementById('color-accent').value;
-
-        // Subtitle
-        const subtitle = document.getElementById('blog-subtitle').value;
-        ctx.font = `600 ${24 * scale}px ${font}`;
-        ctx.fillStyle = primaryCol;
-        ctx.textAlign = 'center';
-        ctx.globalAlpha = 0.9;
-        ctx.fillText(subtitle.toUpperCase(), 400, 100);
-        ctx.globalAlpha = 1.0;
-
-        // Main Title (Wrapping)
-        const title = document.getElementById('blog-title').value;
-        ctx.font = `800 ${52 * scale}px ${font}`;
-        wrapText(title, 400, 180, 700, 65 * scale, primaryCol, accentCol);
-
-        // URL
-        drawUrl(primaryCol);
-    }
-
-    function drawVSHeader() {
-        const font = document.getElementById('font-family').value;
-        
-        // Background
-        ctx.fillStyle = '#f8fafc';
-        ctx.fillRect(0,0, 800, 400);
-
-        // Header Strip
-        ctx.fillStyle = document.getElementById('vs-header-bg').value;
-        ctx.fillRect(0,0, 800, 60);
-
-        // Header Text
-        ctx.font = `700 20px ${font}`;
-        ctx.fillStyle = document.getElementById('vs-header-text').value;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(document.getElementById('vs-title').value, 25, 32);
-        
-        // Header URL
-        ctx.textAlign = 'right';
-        ctx.font = `600 16px ${font}`;
-        ctx.globalAlpha = 0.9;
-        ctx.fillText(document.getElementById('website-url').value, 775, 32);
-        ctx.globalAlpha = 1.0;
-
-        // --- Circles Layout ---
-        const centerY = 200; // shifted down slightly
-        const cx = 400;
-        const r = 90; 
-        const offset = 130;
-        
-        const leftX = cx - offset;
-        const rightX = cx + offset;
-
-        const leftCol = document.getElementById('vs-left-col').value;
-        const rightCol = document.getElementById('vs-right-col').value;
-
-        // Draw Left Product Circle
-        drawProductCircle(leftX, centerY, r, state.leftImg, state.offsets.left, leftCol);
-        // Draw Right Product Circle
-        drawProductCircle(rightX, centerY, r, state.rightImg, state.offsets.right, rightCol);
-
-        // VS Badge
-        drawVSBadge(cx, centerY);
-
-        // Labels & Descriptions
-        const labelY = centerY + r + 35;
-        
-        // Left Label
-        drawBadgeLabel(leftX, labelY, document.getElementById('left-name').value, leftCol, font);
-        // Right Label
-        drawBadgeLabel(rightX, labelY, document.getElementById('right-name').value, rightCol, font);
-
-        // Descriptions
-        const descY = labelY + 35;
-        ctx.fillStyle = '#334155';
-        ctx.font = `400 13px ${font}`;
-        ctx.textAlign = 'center';
-        
-        wrapTextSimple(document.getElementById('left-desc').value, leftX, descY, 220, 18);
-        wrapTextSimple(document.getElementById('right-desc').value, rightX, descY, 220, 18);
-    }
-
-    // --- Helpers ---
-
-    function drawCoverImage(img) {
-        const scale = Math.max(800/img.width, 400/img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        ctx.drawImage(img, (800-w)/2, (400-h)/2, w, h);
-    }
-
-    function drawProductCircle(x, y, r, img, offset, color) {
-        ctx.save();
-        // Shadow
-        ctx.shadowColor = 'rgba(0,0,0,0.15)';
-        ctx.shadowBlur = 20;
-        ctx.shadowOffsetY = 10;
-        
-        // Background circle
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI*2);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        
-        // Border
-        ctx.shadowColor = 'transparent';
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = color;
-        ctx.stroke();
-
-        // Clip & Image
-        ctx.beginPath();
-        ctx.arc(x, y, r-4, 0, Math.PI*2);
-        ctx.clip();
-
-        if(img) {
-            // "Cover" fit logic for circle
-            const scale = Math.max((r*2)/img.width, (r*2)/img.height);
-            const w = img.width * scale;
-            const h = img.height * scale;
-            ctx.drawImage(img, x - w/2 + offset.x, y - h/2 + offset.y, w, h);
-        } else {
-            ctx.fillStyle = '#f1f5f9';
-            ctx.fillRect(x-r, y-r, r*2, r*2);
-            ctx.fillStyle = '#cbd5e1';
-            ctx.font = '30px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('📷', x, y);
-        }
-        ctx.restore();
-    }
-
-    function drawVSBadge(x, y) {
-        ctx.save();
-        const grad = ctx.createLinearGradient(x-30, y-30, x+30, y+30);
-        grad.addColorStop(0, '#ef4444');
-        grad.addColorStop(1, '#b91c1c');
-        
-        ctx.beginPath();
-        ctx.arc(x, y, 32, 0, Math.PI*2);
-        ctx.fillStyle = grad;
-        ctx.shadowColor = 'rgba(0,0,0,0.2)';
-        ctx.shadowBlur = 10;
-        ctx.fill();
-        
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = 'white';
-        ctx.stroke();
-
-        ctx.fillStyle = 'white';
-        ctx.font = '900 24px Inter';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'transparent';
-        ctx.fillText('VS', x, y+2);
-        ctx.restore();
-    }
-
-    function drawBadgeLabel(x, y, text, color, font) {
-        ctx.save();
-        ctx.font = `700 15px ${font}`;
-        const width = Math.max(120, ctx.measureText(text).width + 30);
-        const height = 36;
-
-        // Pill shape background
-        ctx.beginPath();
-        ctx.roundRect(x - width/2, y, width, height, 18);
-        ctx.fillStyle = color;
-        ctx.shadowColor = 'rgba(0,0,0,0.1)';
-        ctx.shadowBlur = 5;
-        ctx.shadowOffsetY = 2;
-        ctx.fill();
-
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'transparent';
-        ctx.fillText(text, x, y + height/2);
-        ctx.restore();
-    }
-
-    function drawUrl(color) {
-        if(state.template !== 'blog') return;
-        const url = document.getElementById('website-url').value;
-        const font = document.getElementById('font-family').value;
-        ctx.font = `600 16px ${font}`;
-        ctx.fillStyle = color;
-        ctx.textAlign = 'right';
-        ctx.fillText(url, 760, 370);
-    }
-
-    // Text Wrapper for Blog Title (With Accent Color support logic simplified)
-    function wrapText(text, x, y, maxWidth, lineHeight, primaryCol, accentCol) {
-        const words = text.split(' ');
-        let line = '';
-        let lines = [];
-
-        for(let n = 0; n < words.length; n++) {
-            let testLine = line + words[n] + ' ';
-            let metrics = ctx.measureText(testLine);
-            let testWidth = metrics.width;
-            if (testWidth > maxWidth && n > 0) {
-                lines.push(line);
-                line = words[n] + ' ';
-            } else {
-                line = testLine;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            // Check if click is within image areas
+            const centerX = canvas.width / 2;
+            const imageY = 90;
+            const circleRadius = 95; // imageSize/2 + 15
+            const vsRadius = 35;
+            const spacing = 30;
+            const distanceFromCenter = circleRadius + spacing + vsRadius;
+            const leftX = centerX - distanceFromCenter;
+            const rightX = centerX + distanceFromCenter;
+            const imageCenter = imageY + circleRadius - 15;
+            
+            // Check left image
+            if (leftImage) {
+                const dist = Math.sqrt((x - leftX) ** 2 + (y - imageCenter) ** 2);
+                if (dist <= circleRadius - 8) {
+                    isDragging = true;
+                    dragTarget = 'left';
+                    dragStart = { x: x - leftImageOffset.x, y: y - leftImageOffset.y };
+                    canvas.style.cursor = 'move';
+                    return;
+                }
+            }
+            
+            // Check right image
+            if (rightImage) {
+                const dist = Math.sqrt((x - rightX) ** 2 + (y - imageCenter) ** 2);
+                if (dist <= circleRadius - 8) {
+                    isDragging = true;
+                    dragTarget = 'right';
+                    dragStart = { x: x - rightImageOffset.x, y: y - rightImageOffset.y };
+                    canvas.style.cursor = 'move';
+                    return;
+                }
             }
         }
-        lines.push(line);
 
-        let startY = y - ((lines.length-1)*lineHeight)/2;
-
-        lines.forEach((l, i) => {
-            // Simple logic: Highlight VIOX or every 3rd word for effect
-            const lWords = l.trim().split(' ');
-            let currentX = x - (ctx.measureText(l).width / 2); // Center alignment manual calculation
+        function handleMouseMove(e) {
+            if (currentTemplate !== 'vs') return;
             
-            ctx.textAlign = 'left';
-            lWords.forEach((w, wi) => {
-                const isAccent = w.toLowerCase().includes('viox') || (wi % 3 === 1 && lines.length < 3);
-                ctx.fillStyle = isAccent ? accentCol : primaryCol;
-                ctx.fillText(w, currentX, startY + (i*lineHeight));
-                currentX += ctx.measureText(w + ' ').width;
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            
+            if (isDragging && dragTarget) {
+                // Calculate new offset
+                const newOffsetX = x - dragStart.x;
+                const newOffsetY = y - dragStart.y;
+                
+                // Limit offset to keep image within reasonable bounds
+                const maxOffset = 50;
+                const limitedOffsetX = Math.max(-maxOffset, Math.min(maxOffset, newOffsetX));
+                const limitedOffsetY = Math.max(-maxOffset, Math.min(maxOffset, newOffsetY));
+                
+                if (dragTarget === 'left') {
+                    leftImageOffset = { x: limitedOffsetX, y: limitedOffsetY };
+                } else if (dragTarget === 'right') {
+                    rightImageOffset = { x: limitedOffsetX, y: limitedOffsetY };
+                }
+                
+                generateHeader();
+            } else {
+                // Check if hovering over draggable areas
+                const centerX = canvas.width / 2;
+                const imageY = 90;
+                const circleRadius = 95;
+                const vsRadius = 35;
+                const spacing = 30;
+                const distanceFromCenter = circleRadius + spacing + vsRadius;
+                const leftX = centerX - distanceFromCenter;
+                const rightX = centerX + distanceFromCenter;
+                const imageCenter = imageY + circleRadius - 15;
+                
+                let overDraggable = false;
+                
+                if (leftImage) {
+                    const dist = Math.sqrt((x - leftX) ** 2 + (y - imageCenter) ** 2);
+                    if (dist <= circleRadius - 8) {
+                        overDraggable = true;
+                    }
+                }
+                
+                if (rightImage && !overDraggable) {
+                    const dist = Math.sqrt((x - rightX) ** 2 + (y - imageCenter) ** 2);
+                    if (dist <= circleRadius - 8) {
+                        overDraggable = true;
+                    }
+                }
+                
+                canvas.style.cursor = overDraggable ? 'move' : 'default';
+            }
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+            dragTarget = null;
+            canvas.style.cursor = 'default';
+        }
+
+        // Add drag and drop functionality to file uploads
+        function setupDragAndDrop(fileInput, callback) {
+            const container = fileInput.closest('.file-upload');
+            const label = container.querySelector('.file-upload-label');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                container.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                container.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                container.addEventListener(eventName, unhighlight, false);
+            });
+
+            container.addEventListener('drop', handleDrop, false);
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            function highlight(e) {
+                label.classList.add('dragover');
+            }
+
+            function unhighlight(e) {
+                label.classList.remove('dragover');
+            }
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    callback(files[0]);
+                }
+            }
+        }
+
+        // Template switching
+        document.querySelectorAll('.template-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.template-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                currentTemplate = this.dataset.template;
+                
+                // Show/hide relevant controls
+                if (currentTemplate === 'blog') {
+                    document.getElementById('blog-controls').classList.remove('hidden');
+                    document.getElementById('vs-controls').classList.add('hidden');
+                    document.getElementById('blog-font-sizes').classList.remove('hidden');
+                    document.getElementById('blog-colors').classList.remove('hidden');
+                } else {
+                    document.getElementById('blog-controls').classList.add('hidden');
+                    document.getElementById('vs-controls').classList.remove('hidden');
+                    document.getElementById('blog-font-sizes').classList.add('hidden');
+                    document.getElementById('blog-colors').classList.add('hidden');
+                }
+                
+                generateHeader();
             });
         });
-    }
 
-    function wrapTextSimple(text, x, y, maxWidth, lineHeight) {
-        const words = text.split(' ');
-        let line = '';
-        const lines = [];
-        for(let n=0; n<words.length; n++) {
-            let testLine = line + words[n] + ' ';
-            if(ctx.measureText(testLine).width > maxWidth && n > 0) {
-                lines.push(line);
-                line = words[n] + ' ';
+        // Load background image for blog template
+        const backgroundUpload = document.getElementById('background-upload');
+        backgroundUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadBackgroundImage(file);
+            }
+        });
+
+        // Setup drag and drop for background upload
+        setupDragAndDrop(backgroundUpload, loadBackgroundImage);
+
+        function loadBackgroundImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load left image for VS template
+        const leftImageUpload = document.getElementById('left-image');
+        leftImageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadLeftImage(file);
+            }
+        });
+
+        // Setup drag and drop for left image
+        setupDragAndDrop(leftImageUpload, loadLeftImage);
+
+        function loadLeftImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    leftImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Load right image for VS template
+        const rightImageUpload = document.getElementById('right-image');
+        rightImageUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadRightImage(file);
+            }
+        });
+
+        // Setup drag and drop for right image
+        setupDragAndDrop(rightImageUpload, loadRightImage);
+
+        function loadRightImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    rightImage = img;
+                    generateHeader();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Auto-generate on input changes
+        document.querySelectorAll('input, textarea, select').forEach(element => {
+            element.addEventListener('input', generateHeader);
+        });
+
+        function generateHeader() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (currentTemplate === 'blog') {
+                generateBlogHeader();
             } else {
-                line = testLine;
+                generateVSHeader();
+            }
+            
+            // Update drag hint visibility
+            updateDragHint();
+        }
+
+        function updateDragHint() {
+            const dragHint = document.getElementById('drag-hint');
+            if (currentTemplate === 'vs' && (leftImage || rightImage)) {
+                dragHint.style.display = 'block';
+            } else {
+                dragHint.style.display = 'none';
             }
         }
-        lines.push(line);
-        
-        // Limit to 3 lines
-        lines.slice(0, 3).forEach((l, i) => {
-            ctx.fillText(l.trim(), x, y + (i*lineHeight));
-        });
-    }
 
-    // --- Drag Interaction (VS Mode) ---
-    canvas.addEventListener('mousedown', (e) => {
-        if(state.template !== 'vs') return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) * (800 / rect.width);
-        const y = (e.clientY - rect.top) * (400 / rect.height);
-        
-        // Hit detection areas
-        const cx = 400; const offset = 130;
-        const areas = {
-            left: { x: cx - offset, y: 200 },
-            right: { x: cx + offset, y: 200 }
-        };
+        function generateBlogHeader() {
+            // Draw background
+            if (backgroundImage) {
+                const scale = Math.max(canvas.width / backgroundImage.width, canvas.height / backgroundImage.height);
+                const scaledWidth = backgroundImage.width * scale;
+                const scaledHeight = backgroundImage.height * scale;
+                const x = (canvas.width - scaledWidth) / 2;
+                const y = (canvas.height - scaledHeight) / 2;
+                
+                ctx.drawImage(backgroundImage, x, y, scaledWidth, scaledHeight);
+            } else {
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#2c3e50');
+                gradient.addColorStop(1, '#34495e');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
 
-        const distLeft = Math.sqrt((x-areas.left.x)**2 + (y-areas.left.y)**2);
-        const distRight = Math.sqrt((x-areas.right.x)**2 + (y-areas.right.y)**2);
+            // Draw overlay
+            const overlayOpacity = document.getElementById('overlay-opacity').value / 100;
+            ctx.fillStyle = `rgba(0, 0, 0, ${overlayOpacity})`;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        if(distLeft < 85) { // 85 is slightly less than radius 90
-            state.drag.active = true;
-            state.drag.target = 'left';
-            state.drag.start = { x: x - state.offsets.left.x, y: y - state.offsets.left.y };
-            canvas.style.cursor = 'move';
-        } else if(distRight < 85) {
-            state.drag.active = true;
-            state.drag.target = 'right';
-            state.drag.start = { x: x - state.offsets.right.x, y: y - state.offsets.right.y };
-            canvas.style.cursor = 'move';
+            // Get values
+            const mainTitle = document.getElementById('main-title').value;
+            const subtitle = document.getElementById('subtitle').value;
+            const websiteUrl = document.getElementById('website-url').value;
+            const fontFamily = document.getElementById('font-family').value;
+            const titleSize = Math.round(document.getElementById('title-size').value * 0.6); // Scale for 800px width
+            const subtitleSize = Math.round(document.getElementById('subtitle-size').value * 0.6);
+            const primaryColor = document.getElementById('primary-color').value;
+            const accentColor = document.getElementById('accent-color').value;
+
+            // Draw subtitle
+            if (subtitle) {
+                ctx.font = `600 ${subtitleSize}px ${fontFamily}`;
+                ctx.fillStyle = primaryColor;
+                ctx.textAlign = 'center';
+                ctx.fillText(subtitle, canvas.width / 2, 80);
+            }
+
+            // Draw main title
+            if (mainTitle) {
+                const words = mainTitle.split(' ');
+                const maxWidth = canvas.width - 80;
+                let lines = [];
+                let currentLine = '';
+
+                ctx.font = `800 ${titleSize}px ${fontFamily}`;
+
+                for (let word of words) {
+                    const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                    const metrics = ctx.measureText(testLine);
+                    
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                if (currentLine) lines.push(currentLine);
+
+                const lineHeight = titleSize * 1.2;
+                const startY = canvas.height / 2 - (lines.length - 1) * lineHeight / 2;
+
+                lines.forEach((line, index) => {
+                    const words = line.split(' ');
+                    let x = canvas.width / 2;
+                    ctx.textAlign = 'center';
+                    
+                    const totalWidth = ctx.measureText(line).width;
+                    x = (canvas.width - totalWidth) / 2;
+                    ctx.textAlign = 'left';
+
+                    words.forEach((word, wordIndex) => {
+                        const isAccentWord = wordIndex % 3 === 1 || word.toLowerCase().includes('viox');
+                        ctx.fillStyle = isAccentWord ? accentColor : primaryColor;
+                        
+                        ctx.fillText(word, x, startY + index * lineHeight);
+                        x += ctx.measureText(word + ' ').width;
+                    });
+                });
+            }
+
+            // Draw website URL
+            if (websiteUrl) {
+                ctx.font = `600 16px ${fontFamily}`;
+                ctx.fillStyle = primaryColor;
+                ctx.textAlign = 'right';
+                ctx.fillText(websiteUrl, canvas.width - 40, canvas.height - 40);
+            }
         }
-    });
 
-    window.addEventListener('mousemove', (e) => {
-        if(!state.drag.active) return;
-        e.preventDefault();
-        
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left) * (800 / rect.width);
-        const y = (e.clientY - rect.top) * (400 / rect.height);
+        function generateVSHeader() {
+            const fontFamily = document.getElementById('font-family').value;
+            const headerBg = document.getElementById('header-bg').value;
+            const headerText = document.getElementById('header-text').value;
+            const leftBtnColor = document.getElementById('left-btn-color').value;
+            const rightBtnColor = document.getElementById('right-btn-color').value;
+            const vsTitle = document.getElementById('vs-title').value;
+            const leftName = document.getElementById('left-name').value;
+            const rightName = document.getElementById('right-name').value;
+            const leftDesc = document.getElementById('left-desc').value;
+            const rightDesc = document.getElementById('right-desc').value;
+            const websiteUrl = document.getElementById('website-url').value;
 
-        const target = state.drag.target;
-        // Calculate new offset
-        let newX = x - state.drag.start.x;
-        let newY = y - state.drag.start.y;
+            // Background
+            ctx.fillStyle = '#f8f9fa';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Limit drag range
-        const limit = 60;
-        newX = Math.max(-limit, Math.min(limit, newX));
-        newY = Math.max(-limit, Math.min(limit, newY));
+            // Header
+            ctx.fillStyle = headerBg;
+            ctx.fillRect(0, 0, canvas.width, 60);
 
-        state.offsets[target] = { x: newX, y: newY };
-        generate();
-    });
+            // Header text
+            ctx.font = `700 18px ${fontFamily}`;
+            ctx.fillStyle = headerText;
+            ctx.textAlign = 'left';
+            ctx.fillText(vsTitle, 20, 38);
 
-    window.addEventListener('mouseup', () => {
-        state.drag.active = false;
-        canvas.style.cursor = 'default';
-    });
+            // Website URL in header
+            if (websiteUrl) {
+                ctx.textAlign = 'right';
+                ctx.fillText(websiteUrl, canvas.width - 20, 38);
+            }
 
-    // --- Download Logic (Fixed Length Limit) ---
-    function downloadImage() {
-        // Determine filename
-        let name = "";
-        if(state.template === 'blog') name = document.getElementById('blog-title').value;
-        else name = document.getElementById('vs-title').value;
+            // Setup positions - properly spaced
+            const centerX = canvas.width / 2;
+            const imageY = 90;
+            const imageSize = 160;
+            const circleRadius = imageSize / 2 + 15;
+            const vsRadius = 35;
+            const spacing = 30; // 5 character spacing approximately
+            
+            // Calculate positions to avoid overlap
+            const distanceFromCenter = circleRadius + spacing + vsRadius;
+            const leftX = centerX - distanceFromCenter;
+            const rightX = centerX + distanceFromCenter;
 
-        // Clean filename but keep full length
-        let filename = name
-            .toLowerCase()
-            .replace(/[^a-z0-9\s]/g, '') // Remove special chars
-            .replace(/\s+/g, '-') // Spaces to dashes
-            .replace(/^-+|-+$/g, ''); // Trim dashes
-        
-        if(!filename) filename = "header-image";
+            // Draw left image container (circle with border and shadow)
+            ctx.save();
+            
+            // Shadow for left circle
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 5;
+            
+            // Outer border circle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = leftBtnColor;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Clip and draw left image
+            ctx.beginPath();
+            ctx.arc(leftX, imageY + circleRadius - 15, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.clip();
+            
+            if (leftImage) {
+                const scale = Math.max((circleRadius - 8) * 2 / leftImage.width, (circleRadius - 8) * 2 / leftImage.height);
+                const scaledWidth = leftImage.width * scale;
+                const scaledHeight = leftImage.height * scale;
+                const imgX = leftX - scaledWidth / 2 + leftImageOffset.x;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2 + leftImageOffset.y;
+                ctx.drawImage(leftImage, imgX, imgY, scaledWidth, scaledHeight);
+            } else {
+                ctx.fillStyle = '#e9ecef';
+                ctx.fillRect(leftX - circleRadius + 8, imageY - 15 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+            }
+            
+            ctx.restore();
 
-        const link = document.createElement('a');
-        link.download = `${filename}.webp`;
-        link.href = canvas.toDataURL('image/webp', 0.9);
-        link.click();
-    }
+            // Draw right image container (circle with border and shadow)
+            ctx.save();
+            
+            // Shadow for right circle
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.15)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 5;
+            
+            // Outer border circle
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Inner border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = rightBtnColor;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius - 6, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Clip and draw right image
+            ctx.beginPath();
+            ctx.arc(rightX, imageY + circleRadius - 15, circleRadius - 8, 0, 2 * Math.PI);
+            ctx.clip();
+            
+            if (rightImage) {
+                const scale = Math.max((circleRadius - 8) * 2 / rightImage.width, (circleRadius - 8) * 2 / rightImage.height);
+                const scaledWidth = rightImage.width * scale;
+                const scaledHeight = rightImage.height * scale;
+                const imgX = rightX - scaledWidth / 2 + rightImageOffset.x;
+                const imgY = imageY + circleRadius - 15 - scaledHeight / 2 + rightImageOffset.y;
+                ctx.drawImage(rightImage, imgX, imgY, scaledWidth, scaledHeight);
+            } else {
+                ctx.fillStyle = '#e9ecef';
+                ctx.fillRect(rightX - circleRadius + 8, imageY - 15 + 8, (circleRadius - 8) * 2, (circleRadius - 8) * 2);
+            }
+            
+            ctx.restore();
 
-    // Initial Draw
-    generate();
+            // Draw VS badge in center - made larger
+            ctx.save();
+            
+            // VS badge shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+            ctx.shadowBlur = 12;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 4;
+            
+            // VS badge background (gradient)
+            const gradient = ctx.createLinearGradient(centerX - 35, imageY + circleRadius - 50, centerX + 35, imageY + circleRadius + 50);
+            gradient.addColorStop(0, '#ff6b6b');
+            gradient.addColorStop(1, '#ee5a52');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(centerX, imageY + circleRadius - 15, 35, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // VS badge border
+            ctx.shadowColor = 'transparent';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(centerX, imageY + circleRadius - 15, 35, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // VS text - made larger
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `900 22px ${fontFamily}`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('VS', centerX, imageY + circleRadius - 15);
+            
+            ctx.restore();
 
-</script>
+            // Product name buttons - dynamic width based on text
+            const btnY = imageY + imageSize + 30;
+            const btnHeight = 40;
+            const btnFont = `700 16px ${fontFamily}`;
+
+            // Calculate button widths based on text
+            ctx.font = btnFont;
+            const leftBtnWidth = Math.max(100, ctx.measureText(leftName).width + 40);
+            const rightBtnWidth = Math.max(100, ctx.measureText(rightName).width + 40);
+
+            // Left button with enhanced style
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+            
+            const leftGradient = ctx.createLinearGradient(leftX - leftBtnWidth/2, btnY, leftX + leftBtnWidth/2, btnY + btnHeight);
+            leftGradient.addColorStop(0, leftBtnColor);
+            leftGradient.addColorStop(1, adjustBrightness(leftBtnColor, -20));
+            
+            ctx.fillStyle = leftGradient;
+            roundRect(ctx, leftX - leftBtnWidth/2, btnY, leftBtnWidth, btnHeight, 20);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = 'white';
+            ctx.font = btnFont;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(leftName, leftX, btnY + btnHeight/2);
+            ctx.restore();
+
+            // Right button with enhanced style
+            ctx.save();
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 8;
+            ctx.shadowOffsetY = 2;
+            
+            const rightGradient = ctx.createLinearGradient(rightX - rightBtnWidth/2, btnY, rightX + rightBtnWidth/2, btnY + btnHeight);
+            rightGradient.addColorStop(0, rightBtnColor);
+            rightGradient.addColorStop(1, adjustBrightness(rightBtnColor, -20));
+            
+            ctx.fillStyle = rightGradient;
+            roundRect(ctx, rightX - rightBtnWidth/2, btnY, rightBtnWidth, btnHeight, 20);
+            
+            ctx.shadowColor = 'transparent';
+            ctx.fillStyle = 'white';
+            ctx.font = btnFont;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(rightName, rightX, btnY + btnHeight/2);
+            ctx.restore();
+
+            // Descriptions as normal paragraphs (one line space from button)
+            const descY = btnY + btnHeight + 20;
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = `400 11px ${fontFamily}`;
+            
+            // Left description (width for ~100 characters, 3 lines max)
+            const descWidth = 200;
+            const leftLines = wrapText(ctx, leftDesc, descWidth).slice(0, 3);
+            leftLines.forEach((line, index) => {
+                ctx.textAlign = 'center';
+                ctx.fillText(line, leftX, descY + index * 14);
+            });
+
+            // Right description (width for ~100 characters, 3 lines max)
+            const rightLines = wrapText(ctx, rightDesc, descWidth).slice(0, 3);
+            rightLines.forEach((line, index) => {
+                ctx.textAlign = 'center';
+                ctx.fillText(line, rightX, descY + index * 14);
+            });
+        }
+
+        // Helper function to adjust color brightness
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)).toString(16).slice(1);
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function wrapText(ctx, text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            for (let word of words) {
+                const testLine = currentLine + (currentLine ? ' ' : '') + word;
+                const metrics = ctx.measureText(testLine);
+                
+                if (metrics.width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
+        function downloadImage() {
+            // Get title based on current template
+            let title = '';
+            if (currentTemplate === 'blog') {
+                title = document.getElementById('main-title').value;
+            } else {
+                title = document.getElementById('vs-title').value;
+            }
+            
+            // Clean title for filename
+            let filename = title
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, '') // Remove special characters
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+            
+            // Fallback if title is empty or becomes empty after cleaning
+            if (!filename) {
+                filename = currentTemplate === 'blog' ? 'blog-header' : 'vs-comparison';
+            }
+            
+            canvas.toBlob(function(blob) {
+                const link = document.createElement('a');
+                link.download = filename + '.webp';
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                URL.revokeObjectURL(link.href);
+            }, 'image/webp', 0.8);
+        }
+
+        // Generate initial header
+        generateHeader();
+    </script>
 </body>
 </html>
